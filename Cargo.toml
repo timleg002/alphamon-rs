@@ -1,0 +1,27 @@
+[package]
+name = "alphamon-rs"
+version = "0.1.0"
+edition = "2024"
+license-file = "LICENSE"
+repository = "https://github.com/timleg002/alphamon-rs"
+description = "Library for interacting with Alpha Outback UPSes"
+keywords = ["serial"]
+categories = ["science"]
+
+[lints.clippy]
+all = "warn"
+cargo = "warn"
+indexing_slicing = "warn"
+
+[dependencies]
+tokio = { version = "1.35.1", features = ["full"] }
+serialport = "4.3.0"
+thiserror = "2.0.12"
+crc = "3.0.1"
+serde = { version = "1.0.197", features = ["serde_derive"] }
+int-enum = "1.1.1"
+serde_json = "1.0.115"
+chrono = "0.4.37"
+log = "0.4.27"
+
+
