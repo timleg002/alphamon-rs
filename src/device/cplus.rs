@@ -128,7 +128,7 @@ impl CPlusSerialInterface {
     }
 
     /// Queries the UPS for info about its rated output voltage, current, frequency and battery voltage.
-    pub async fn query_ups_rating(&mut self) -> Result<cplus::UPSInformation> {
+    pub async fn query_ups_rating(&mut self) -> Result<cplus::UPSRating> {
         self.processed_query(cplus::CMD_RATING_INFORMATION).await
     }
 }
