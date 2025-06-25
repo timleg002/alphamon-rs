@@ -2,8 +2,6 @@ use crate::Result;
 use crate::error;
 use crate::model::FromBytes;
 use crate::model::cplus;
-use async_trait::async_trait;
-use serialport::ClearBuffer;
 use std::ffi::CString;
 use std::io::Write;
 use std::time::Duration;
@@ -20,32 +18,31 @@ const STATUS_MSG_PREFIX: u8 = b'(';
 /// Prefix of the UPSRating message.
 const RATING_MSG_PREFIX: u8 = b'#';
 
-#[async_trait]
 pub trait CPlusInterface {
     /// Queries the input/output voltage, load percentage, input AC frequency,
     /// battery capacity temperature and the UPS status and errors/warnings (battery, etc.)
-    async fn query_ups_status(&mut self) -> Result<cplus::StatusInquiryResponse>;
+    fn query_ups_status(&mut self) -> Result<cplus::StatusInquiryResponse>;
 
     /// Queries the UPS output AC frequency, per-battery voltage, UPS load in watts,
     /// UPS error code, and the UPS load current in amperes.
-    async fn query_extra_power_info(&mut self) -> Result<cplus::ExtraPowerInfoResponse>;
+     fn query_extra_power_info(&mut self) -> Result<cplus::ExtraPowerInfoResponse>;
 
     /// Queries the UPS for alarm notifications: whether the inverter is on or off,
     /// or if the UPS itself is in the state of an alarm.
-    async fn query_alarm(&mut self) -> Result<cplus::AlarmInquiryResponse>;
+     fn query_alarm(&mut self) -> Result<cplus::AlarmInquiryResponse>;
 
     /// Queries the UPS for the length of time during which the UPS can
     /// provide power, taking in account the current load and battery capacity.
-    async fn query_ups_autonomy(&mut self) -> Result<cplus::AutonomyResponse>;
+     fn query_ups_autonomy(&mut self) -> Result<cplus::AutonomyResponse>;
 
     /// Queries the UPS for the remaining lifetime of its battery.
-    async fn query_ups_battery_life(&mut self) -> Result<cplus::BatteryLifeResponse>;
+     fn query_ups_battery_life(&mut self) -> Result<cplus::BatteryLifeResponse>;
 
     /// Queries the UPS for info about its manufacturer, model name and version.
-    async fn query_ups_info(&mut self) -> Result<cplus::UPSInformation>;
+     fn query_ups_info(&mut self) -> Result<cplus::UPSInformation>;
 
     /// Queries the UPS for info about its rated output voltage, current, frequency and battery voltage.
-    async fn query_ups_rating(&mut self) -> Result<cplus::UPSRating>;
+     fn query_ups_rating(&mut self) -> Result<cplus::UPSRating>;
 }
 
 #[cfg(feature = "serial")]
@@ -68,7 +65,7 @@ impl CPlusSerialInterface {
     }
 
     /// Writes data to the serial port along with the end byte.
-    async fn write_data(&mut self, msg: &[u8]) -> Result<()> {
+     fn write_data(&mut self, msg: &[u8]) -> Result<()> {
         self.port.write_all(msg)?;
         self.port.write_all(&[END_BYTE])?;
 
@@ -78,7 +75,7 @@ impl CPlusSerialInterface {
     }
 
     /// Reads data from the serial port until an end byte (CR) is encountered.
-    async fn read_data(&mut self) -> Result<Vec<u8>> {
+     fn read_data(&mut self) -> Result<Vec<u8>> {
         let mut buf = vec![];
 
         trace!("Reading buffer");
@@ -101,25 +98,25 @@ impl CPlusSerialInterface {
     }
 
     /// Queries - writes a command and awaits its response
-    async fn raw_query(&mut self, query: &[u8]) -> Result<Vec<u8>> {
+     fn raw_query(&mut self, query: &[u8]) -> Result<Vec<u8>> {
         trace!("Querying with message {:?}", String::from_utf8_lossy(query));
 
         // A synchronization error can cause a partial packet to be in the input buffer
-        self.port.clear(ClearBuffer::All)?;
+        self.port.clear(serialport::ClearBuffer::All)?;
 
-        self.write_data(query).await?;
-        let output = self.read_data().await?;
+        self.write_data(query)?;
+        let output = self.read_data()?;
 
         Ok(output)
     }
 
     /// Queries the device and returns the processed response as a struct
-    async fn processed_query<T>(&mut self, query: &[u8]) -> Result<T>
+     fn processed_query<T>(&mut self, query: &[u8]) -> Result<T>
     where
         T: FromBytes,
         <T as FromBytes>::Err: Into<error::Error>,
     {
-        let raw_query = self.raw_query(query).await?;
+        let raw_query = self.raw_query(query)?;
 
         // Remove the start byte
         let Some(processed_bytes) = &raw_query.get(1..) else {
@@ -131,46 +128,45 @@ impl CPlusSerialInterface {
 }
 
 #[cfg(feature = "serial")]
-#[async_trait]
 impl CPlusInterface for CPlusSerialInterface {
     /// Queries the input/output voltage, load percentage, input AC frequency,
     /// battery capacity temperature and the UPS status and errors/warnings (battery, etc.)
-    async fn query_ups_status(&mut self) -> Result<cplus::StatusInquiryResponse> {
-        self.processed_query(cplus::CMD_STATUS_INQUIRY).await
+     fn query_ups_status(&mut self) -> Result<cplus::StatusInquiryResponse> {
+        self.processed_query(cplus::CMD_STATUS_INQUIRY)
     }
 
     /// Queries the UPS output AC frequency, per-battery voltage, UPS load in watts,
     /// UPS error code, and the UPS load current in amperes.
-    async fn query_extra_power_info(&mut self) -> Result<cplus::ExtraPowerInfoResponse> {
+     fn query_extra_power_info(&mut self) -> Result<cplus::ExtraPowerInfoResponse> {
         self.processed_query(cplus::CMD_EXTRA_POWER_PARAMETERS_INFO)
-            .await
+            
     }
 
     /// Queries the UPS for alarm notifications: whether the inverter is on or off,
     /// or if the UPS itself is in the state of an alarm.
-    async fn query_alarm(&mut self) -> Result<cplus::AlarmInquiryResponse> {
-        self.processed_query(cplus::CMD_ALARM_INQUIRY).await
+     fn query_alarm(&mut self) -> Result<cplus::AlarmInquiryResponse> {
+        self.processed_query(cplus::CMD_ALARM_INQUIRY)
     }
 
     /// Queries the UPS for the length of time during which the UPS can
     /// provide power, taking in account the current load and battery capacity.
-    async fn query_ups_autonomy(&mut self) -> Result<cplus::AutonomyResponse> {
-        self.processed_query(cplus::CMD_AUTONOMY).await
+     fn query_ups_autonomy(&mut self) -> Result<cplus::AutonomyResponse> {
+        self.processed_query(cplus::CMD_AUTONOMY)
     }
 
     /// Queries the UPS for the remaining lifetime of its battery.
-    async fn query_ups_battery_life(&mut self) -> Result<cplus::BatteryLifeResponse> {
-        self.processed_query(cplus::CMD_BATTERY_LIFE).await
+     fn query_ups_battery_life(&mut self) -> Result<cplus::BatteryLifeResponse> {
+        self.processed_query(cplus::CMD_BATTERY_LIFE)
     }
 
     /// Queries the UPS for info about its manufacturer, model name and version.
-    async fn query_ups_info(&mut self) -> Result<cplus::UPSInformation> {
-        self.processed_query(cplus::CMD_UPS_INFORMATION).await
+     fn query_ups_info(&mut self) -> Result<cplus::UPSInformation> {
+        self.processed_query(cplus::CMD_UPS_INFORMATION)
     }
 
     /// Queries the UPS for info about its rated output voltage, current, frequency and battery voltage.
-    async fn query_ups_rating(&mut self) -> Result<cplus::UPSRating> {
-        self.processed_query(cplus::CMD_RATING_INFORMATION).await
+     fn query_ups_rating(&mut self) -> Result<cplus::UPSRating> {
+        self.processed_query(cplus::CMD_RATING_INFORMATION)
     }
 }
 
@@ -264,33 +260,32 @@ impl CPlusHidInterface {
 }
 
 #[cfg(feature = "usb-hidapi")]
-#[async_trait]
 impl CPlusInterface for CPlusHidInterface {
-    async fn query_ups_status(&mut self) -> Result<cplus::StatusInquiryResponse> {
+     fn query_ups_status(&mut self) -> Result<cplus::StatusInquiryResponse> {
         self.read_processed_data(Some(STATUS_MSG_PREFIX))
     }
     
-    async fn query_ups_rating(&mut self) -> Result<cplus::UPSRating> {
+     fn query_ups_rating(&mut self) -> Result<cplus::UPSRating> {
         self.read_processed_data(Some(RATING_MSG_PREFIX))
     }
 
-    async fn query_extra_power_info(&mut self) -> Result<cplus::ExtraPowerInfoResponse> {
+     fn query_extra_power_info(&mut self) -> Result<cplus::ExtraPowerInfoResponse> {
         unimplemented!("HID interface USB v0.2 only supports status and rating queries")
     }
 
-    async fn query_alarm(&mut self) -> Result<cplus::AlarmInquiryResponse> {
+     fn query_alarm(&mut self) -> Result<cplus::AlarmInquiryResponse> {
         unimplemented!("HID interface USB v0.2 only supports status and rating queries")
     }
 
-    async fn query_ups_autonomy(&mut self) -> Result<cplus::AutonomyResponse> {
+     fn query_ups_autonomy(&mut self) -> Result<cplus::AutonomyResponse> {
         unimplemented!("HID interface USB v0.2 only supports status and rating queries")
     }
 
-    async fn query_ups_battery_life(&mut self) -> Result<cplus::BatteryLifeResponse> {
+     fn query_ups_battery_life(&mut self) -> Result<cplus::BatteryLifeResponse> {
         unimplemented!("HID interface USB v0.2 only supports status and rating queries")
     }
 
-    async fn query_ups_info(&mut self) -> Result<cplus::UPSInformation> {
+     fn query_ups_info(&mut self) -> Result<cplus::UPSInformation> {
         unimplemented!("HID interface USB v0.2 only supports status and rating queries")
     }
 }

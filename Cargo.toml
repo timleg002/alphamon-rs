@@ -1,6 +1,6 @@
 [package]
 name = "alphamon-rs"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2024"
 license-file = "LICENSE"
 repository = "https://github.com/timleg002/alphamon-rs"
@@ -11,7 +11,7 @@ categories = ["science"]
 [features]
 serial = ["serialport"]
 usb-hidapi = ["hidapi"]
-default = ["serial", "usb-hidapi"]
+default = ["usb-hidapi", "serialport"]
 
 [lints.clippy]
 all = "warn"
