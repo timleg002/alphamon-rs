@@ -1,9 +1,10 @@
 use crate::Result;
 use crate::error;
 use crate::model::FromBytes;
-use crate::model::cplus::{self, UPSRating, UPSStatus};
+use crate::model::cplus;
+use async_trait::async_trait;
 use serialport::ClearBuffer;
-use std::ffi::{CStr, CString};
+use std::ffi::CString;
 use std::io::Write;
 use std::time::Duration;
 
@@ -19,6 +20,7 @@ const STATUS_MSG_PREFIX: u8 = b'(';
 /// Prefix of the UPSRating message.
 const RATING_MSG_PREFIX: u8 = b'#';
 
+#[async_trait]
 pub trait CPlusInterface {
     /// Queries the input/output voltage, load percentage, input AC frequency,
     /// battery capacity temperature and the UPS status and errors/warnings (battery, etc.)
@@ -129,6 +131,7 @@ impl CPlusSerialInterface {
 }
 
 #[cfg(feature = "serial")]
+#[async_trait]
 impl CPlusInterface for CPlusSerialInterface {
     /// Queries the input/output voltage, load percentage, input AC frequency,
     /// battery capacity temperature and the UPS status and errors/warnings (battery, etc.)
@@ -172,12 +175,12 @@ impl CPlusInterface for CPlusSerialInterface {
 }
 
 #[cfg(feature = "usb-hidapi")]
-#[derive()]
 pub struct CPlusHidInterface {
     api: hidapi::HidApi,
     device: hidapi::HidDevice,
 }
 
+#[cfg(feature = "usb-hidapi")]
 impl CPlusHidInterface {
     /// Connects to the given HID device at `path`.
     pub fn connect_with_path(path: String) -> Result<Self> {
@@ -260,6 +263,8 @@ impl CPlusHidInterface {
     }
 }
 
+#[cfg(feature = "usb-hidapi")]
+#[async_trait]
 impl CPlusInterface for CPlusHidInterface {
     async fn query_ups_status(&mut self) -> Result<cplus::StatusInquiryResponse> {
         self.read_processed_data(Some(STATUS_MSG_PREFIX))
