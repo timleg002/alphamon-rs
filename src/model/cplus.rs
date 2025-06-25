@@ -5,7 +5,7 @@ use crate::{Result, error::Error};
 
 use crate::model::FromBytes;
 
-pub(crate) const BAUD_RATE: u32 = 2_400;
+pub(crate) const SERIAL_BAUD_RATE: u32 = 2_400;
 
 pub(crate) static CMD_STATUS_INQUIRY: &[u8] = b"Q1";
 pub(crate) static CMD_ALARM_INQUIRY: &[u8] = b"Q4";

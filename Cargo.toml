@@ -1,12 +1,17 @@
 [package]
 name = "alphamon-rs"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 license-file = "LICENSE"
 repository = "https://github.com/timleg002/alphamon-rs"
 description = "Library for interacting with Alpha Outback UPSes"
 keywords = ["serial"]
 categories = ["science"]
+
+[features]
+serial = ["serialport"]
+usb-hidapi = ["hidapi"]
+default = ["serial", "usb-hidapi"]
 
 [lints.clippy]
 all = "warn"
@@ -15,7 +20,8 @@ indexing_slicing = "warn"
 
 [dependencies]
 tokio = { version = "1.35.1", features = ["full"] }
-serialport = "4.3.0"
+serialport = { version = "4.3.0", optional = true }
+hidapi =  { version = "2.6.3", optional = true, default-features = false, features = ["linux-native"] }
 thiserror = "2.0.12"
 crc = "3.0.1"
 serde = { version = "1.0.197", features = ["serde_derive"] }
