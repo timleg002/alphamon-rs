@@ -111,7 +111,7 @@ impl CPlusSerialInterface {
     }
 
     /// Queries the device and returns the processed response as a struct
-     fn processed_query<T>(&mut self, query: &[u8]) -> Result<T>
+    fn processed_query<T>(&mut self, query: &[u8]) -> Result<T>
     where
         T: FromBytes,
         <T as FromBytes>::Err: Into<error::Error>,

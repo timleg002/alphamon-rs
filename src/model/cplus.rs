@@ -23,7 +23,7 @@ pub(crate) static CMD_UPS_INFORMATION: &[u8] = b"I";
 // Queries the UPS for its information
 pub(crate) static CMD_RATING_INFORMATION: &[u8] = b"F";
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct StatusInquiryResponse {
     /// V
     pub input_voltage: f32,
@@ -178,7 +178,7 @@ impl FromBytes for StatusInquiryResponse {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct UPSStatus {
     pub utility_fail: bool,
     pub battery_low: bool,
@@ -223,7 +223,7 @@ impl FromBytes for UPSStatus {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct AlarmInquiryResponse {
     pub inverter_on: bool,
     pub ups_alarm_on: bool
@@ -250,7 +250,7 @@ impl FromBytes for AlarmInquiryResponse {
     }
 }
     
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct ExtraPowerInfoResponse {
     /// Hz
     pub ups_output_freq: f32,
@@ -297,7 +297,7 @@ impl FromBytes for ExtraPowerInfoResponse {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct AutonomyResponse {
     pub time: time::Duration,
 }
@@ -316,7 +316,7 @@ impl FromBytes for AutonomyResponse {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct BatteryLifeResponse {
     pub time: time::Duration,
 }
@@ -335,7 +335,7 @@ impl FromBytes for BatteryLifeResponse {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct UPSInformation {
     pub manufacturer_name: String,
     pub model: String,
@@ -358,7 +358,7 @@ impl FromBytes for UPSInformation {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct UPSRating {
     /// V
     pub output_rating_voltage: f32,
