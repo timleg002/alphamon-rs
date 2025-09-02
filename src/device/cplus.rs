@@ -17,6 +17,7 @@ const STATUS_MSG_PREFIX: u8 = b'(';
 /// Prefix of the UPSRating message.
 const RATING_MSG_PREFIX: u8 = b'#';
 
+/// Generic interface for the Continuity Plus UPS communication.
 pub trait CPlusInterface {
     /// Queries the input/output voltage, load percentage, input AC frequency,
     /// battery capacity temperature and the UPS status and errors/warnings (battery, etc.)
@@ -24,28 +25,29 @@ pub trait CPlusInterface {
 
     /// Queries the UPS output AC frequency, per-battery voltage, UPS load in watts,
     /// UPS error code, and the UPS load current in amperes.
-     fn query_extra_power_info(&mut self) -> Result<cplus::ExtraPowerInfoResponse>;
+    fn query_extra_power_info(&mut self) -> Result<cplus::ExtraPowerInfoResponse>;
 
     /// Queries the UPS for alarm notifications: whether the inverter is on or off,
     /// or if the UPS itself is in the state of an alarm.
-     fn query_alarm(&mut self) -> Result<cplus::AlarmInquiryResponse>;
+    fn query_alarm(&mut self) -> Result<cplus::AlarmInquiryResponse>;
 
     /// Queries the UPS for the length of time during which the UPS can
     /// provide power, taking in account the current load and battery capacity.
-     fn query_ups_autonomy(&mut self) -> Result<cplus::AutonomyResponse>;
+    fn query_ups_autonomy(&mut self) -> Result<cplus::AutonomyResponse>;
 
     /// Queries the UPS for the remaining lifetime of its battery.
-     fn query_ups_battery_life(&mut self) -> Result<cplus::BatteryLifeResponse>;
+    fn query_ups_battery_life(&mut self) -> Result<cplus::BatteryLifeResponse>;
 
     /// Queries the UPS for info about its manufacturer, model name and version.
-     fn query_ups_info(&mut self) -> Result<cplus::UPSInformation>;
+    fn query_ups_info(&mut self) -> Result<cplus::UPSInformation>;
 
     /// Queries the UPS for info about its rated output voltage, current, frequency and battery voltage.
-     fn query_ups_rating(&mut self) -> Result<cplus::UPSRating>;
+    fn query_ups_rating(&mut self) -> Result<cplus::UPSRating>;
 }
 
 #[cfg(feature = "serial")]
 #[derive(Debug)]
+/// Serial port interface for the Continuity Plus UPSes.
 pub struct CPlusSerialInterface {
     port: Box<dyn serialport::SerialPort>,
 }
@@ -128,48 +130,38 @@ impl CPlusSerialInterface {
 
 #[cfg(feature = "serial")]
 impl CPlusInterface for CPlusSerialInterface {
-    /// Queries the input/output voltage, load percentage, input AC frequency,
-    /// battery capacity temperature and the UPS status and errors/warnings (battery, etc.)
-     fn query_ups_status(&mut self) -> Result<cplus::StatusInquiryResponse> {
+    fn query_ups_status(&mut self) -> Result<cplus::StatusInquiryResponse> {
         self.processed_query(cplus::CMD_STATUS_INQUIRY)
     }
 
-    /// Queries the UPS output AC frequency, per-battery voltage, UPS load in watts,
-    /// UPS error code, and the UPS load current in amperes.
-     fn query_extra_power_info(&mut self) -> Result<cplus::ExtraPowerInfoResponse> {
+    fn query_extra_power_info(&mut self) -> Result<cplus::ExtraPowerInfoResponse> {
         self.processed_query(cplus::CMD_EXTRA_POWER_PARAMETERS_INFO)
             
     }
 
-    /// Queries the UPS for alarm notifications: whether the inverter is on or off,
-    /// or if the UPS itself is in the state of an alarm.
-     fn query_alarm(&mut self) -> Result<cplus::AlarmInquiryResponse> {
+    fn query_alarm(&mut self) -> Result<cplus::AlarmInquiryResponse> {
         self.processed_query(cplus::CMD_ALARM_INQUIRY)
     }
 
-    /// Queries the UPS for the length of time during which the UPS can
-    /// provide power, taking in account the current load and battery capacity.
-     fn query_ups_autonomy(&mut self) -> Result<cplus::AutonomyResponse> {
+    fn query_ups_autonomy(&mut self) -> Result<cplus::AutonomyResponse> {
         self.processed_query(cplus::CMD_AUTONOMY)
     }
 
-    /// Queries the UPS for the remaining lifetime of its battery.
-     fn query_ups_battery_life(&mut self) -> Result<cplus::BatteryLifeResponse> {
+    fn query_ups_battery_life(&mut self) -> Result<cplus::BatteryLifeResponse> {
         self.processed_query(cplus::CMD_BATTERY_LIFE)
     }
 
-    /// Queries the UPS for info about its manufacturer, model name and version.
-     fn query_ups_info(&mut self) -> Result<cplus::UPSInformation> {
+    fn query_ups_info(&mut self) -> Result<cplus::UPSInformation> {
         self.processed_query(cplus::CMD_UPS_INFORMATION)
     }
 
-    /// Queries the UPS for info about its rated output voltage, current, frequency and battery voltage.
-     fn query_ups_rating(&mut self) -> Result<cplus::UPSRating> {
+    fn query_ups_rating(&mut self) -> Result<cplus::UPSRating> {
         self.processed_query(cplus::CMD_RATING_INFORMATION)
     }
 }
 
 #[cfg(feature = "usb-hidapi")]
+/// USB HID interface for the Continuity Plus UPSes.
 pub struct CPlusHidInterface {
     device: hidapi::HidDevice,
 }

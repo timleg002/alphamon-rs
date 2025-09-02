@@ -23,10 +23,12 @@ pub(crate) static CMD_UPS_INFORMATION: &[u8] = b"I";
 pub(crate) static CMD_RATING_INFORMATION: &[u8] = b"F";
 
 #[derive(Debug, Serialize, Clone)]
+/// Response containing the UPS status info, such as the input/output voltage, 
+/// load percentage, battery capacity, etc.
 pub struct StatusInquiryResponse {
     /// V
     pub input_voltage: f32,
-    /// "Do not use" (V)
+    /// V (Marked as "do not use" by the protocol)
     pub input_fault_voltage: f32, 
     /// V
     pub output_voltage: f32,
@@ -40,6 +42,7 @@ pub struct StatusInquiryResponse {
     pub battery_capacity_parameter: String,
     /// °C
     pub temperature: f32,
+    /// Specific information about the UPS status, such as beeper state, alarm state, battery warning, etc.
     pub ups_status: UPSStatus
 }
 
@@ -178,6 +181,7 @@ impl FromBytes for StatusInquiryResponse {
 }
 
 #[derive(Debug, Serialize, Clone)]
+/// Contains specific information about the UPS status, such as beeper state, alarm state, battery warning, etc.
 pub struct UPSStatus {
     pub utility_fail: bool,
     pub battery_low: bool,
@@ -223,6 +227,8 @@ impl FromBytes for UPSStatus {
 }
 
 #[derive(Debug, Serialize, Clone)]
+/// Response for the alarm inquiry command. 
+/// Specifies the state of the inverter and the UPS alarm.
 pub struct AlarmInquiryResponse {
     pub inverter_on: bool,
     pub ups_alarm_on: bool
@@ -250,6 +256,8 @@ impl FromBytes for AlarmInquiryResponse {
 }
     
 #[derive(Debug, Serialize, Clone)]
+/// Contains additional status info about the UPS, such as the UPS output frequency, 
+/// battery voltage, load in watts, etc.
 pub struct ExtraPowerInfoResponse {
     /// Hz
     pub ups_output_freq: f32,
@@ -297,6 +305,9 @@ impl FromBytes for ExtraPowerInfoResponse {
 }
 
 #[derive(Debug, Serialize, Clone)]
+/// Contains the expected UPS runtime if power were to fail.
+/// 
+/// Note: some UPSes of this series tested do not return this message.
 pub struct AutonomyResponse {
     pub time: time::Duration,
 }
@@ -316,6 +327,9 @@ impl FromBytes for AutonomyResponse {
 }
 
 #[derive(Debug, Serialize, Clone)]
+/// Contains the expected longevity of the UPS battery.
+/// 
+/// Note: some UPSes of this series tested do not return this message.
 pub struct BatteryLifeResponse {
     pub time: time::Duration,
 }
@@ -335,6 +349,7 @@ impl FromBytes for BatteryLifeResponse {
 }
 
 #[derive(Debug, Serialize, Clone)]
+/// Contains manufacturer information about the UPS, such as the manufacturer, the model and the revision.
 pub struct UPSInformation {
     pub manufacturer_name: String,
     pub model: String,
@@ -358,6 +373,7 @@ impl FromBytes for UPSInformation {
 }
 
 #[derive(Debug, Serialize, Clone)]
+/// Contains the rated UPS information (such as the output rated voltage/current, etc.)
 pub struct UPSRating {
     /// V
     pub output_rating_voltage: f32,

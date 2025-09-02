@@ -1,9 +1,11 @@
+/// Models for interfacing with the Continuity Plus series UPS.
 pub mod cplus;
 
 /// Trait for command responses (which are de-/serialized as a sequence of bytes).
 pub trait FromBytes {
     type Err;
 
+    /// Converts bytes to a struct.
     fn from_bytes(s: &[u8]) -> Result<Self, Self::Err>
         where Self: Sized;
 }
