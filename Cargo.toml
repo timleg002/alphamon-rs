@@ -2,7 +2,7 @@
 name = "alphamon-rs"
 version = "0.2.3"
 edition = "2024"
-license-file = "LICENSE"
+license = "MIT"
 repository = "https://github.com/timleg002/alphamon-rs"
 description = "Library for interacting with Alpha Outback UPSes"
 keywords = ["serial"]
