@@ -1,5 +1,30 @@
 //! Library for monitoring Alpha Outback-type UPSes via a serial interface. Works for Alpha Outback UPSes using the Alphamon software. 
 //! Based on the official protocol published by Alpha Outback.
+//! 
+//! ## Platforms
+//! 
+//! Tested on Windows (x64) and Linux (aarch64 and armv7). Also running in production for these platforms.
+//! 
+//! ## Example
+//! 
+//! Examples are provided in the `examples` folder. Additionally, the [alphamon-cli-rs] crate is based on this library 
+//! and contains a full implementation of all query commands in this library.
+//! 
+//! [alphamon-cli-rs]: https://github.com/timleg002/alphamon-cli-rs
+//! 
+//! ```no_run
+//! use alphamon_rs::device::cplus::{self, CPlusInterface as _};
+//! 
+//! fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     let mut iface = cplus::CPlusSerialInterface::connect("COM4")?; // Specify your port path
+//! 
+//!     let status = iface.query_ups_status()?;
+//! 
+//!     println!("{status:#?}");
+//! 
+//!     Ok(())
+//! }
+//! ```
 
 #[macro_use]
 extern crate log;
