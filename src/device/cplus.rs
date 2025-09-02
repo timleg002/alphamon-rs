@@ -1,5 +1,4 @@
-use crate::Result;
-use crate::error;
+use crate::{Error, Result};
 use crate::model::FromBytes;
 use crate::model::cplus;
 use std::ffi::CString;
@@ -114,13 +113,13 @@ impl CPlusSerialInterface {
     fn processed_query<T>(&mut self, query: &[u8]) -> Result<T>
     where
         T: FromBytes,
-        <T as FromBytes>::Err: Into<error::Error>,
+        <T as FromBytes>::Err: Into<crate::Error>,
     {
         let raw_query = self.raw_query(query)?;
 
         // Remove the start byte
         let Some(processed_bytes) = &raw_query.get(1..) else {
-            return Err(error::Error::InvalidFormat);
+            return Err(crate::Error::InvalidFormat);
         };
 
         T::from_bytes(processed_bytes).map_err(|e| e.into())
@@ -204,7 +203,7 @@ impl CPlusHidInterface {
     /// Reads raw data from the data feature report.
     /// The buffer is expected to be at least 2 bytes long.
     fn read_raw_data(&mut self, buf: &mut [u8]) -> Result<usize> {
-        let report_id = buf.get_mut(0).ok_or(error::Error::BufferTooSmall {
+        let report_id = buf.get_mut(0).ok_or(crate::Error::BufferTooSmall {
             expected: 1,
             provided: 0,
         })?;
@@ -244,7 +243,7 @@ impl CPlusHidInterface {
     }
 
     fn read_processed_data<T>(&mut self, start_idx: Option<u8>) -> Result<T> 
-        where T: FromBytes, <T as FromBytes>::Err: Into<error::Error> 
+        where T: FromBytes, <T as FromBytes>::Err: Into<crate::Error> 
     {
         let mut buf = vec![0u8; 48];
 
@@ -252,7 +251,7 @@ impl CPlusHidInterface {
 
         // First byte is the start_idx, the message ends with the end byte (carriage return)
         let Some(processed_bytes) = &buf.get(1..cr_idx) else {
-            return Err(error::Error::InvalidFormat);
+            return Err(crate::Error::InvalidFormat);
         };
 
         T::from_bytes(processed_bytes).map_err(|e| e.into())

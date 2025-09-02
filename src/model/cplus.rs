@@ -1,7 +1,6 @@
 use serde::Serialize;
 use tokio::time;
-use crate::error;
-use crate::{Result, error::Error};
+use crate::{Error, Result};
 
 use crate::model::FromBytes;
 
@@ -45,7 +44,7 @@ pub struct StatusInquiryResponse {
 }
 
 impl FromBytes for StatusInquiryResponse {
-    type Err = error::Error;
+    type Err = crate::Error;
 
     fn from_bytes(s: &[u8]) -> Result<Self> {
         let [
@@ -193,7 +192,7 @@ pub struct UPSStatus {
 }
 
 impl FromBytes for UPSStatus {
-    type Err = error::Error;
+    type Err = crate::Error;
 
     fn from_bytes(s: &[u8]) -> Result<Self> {
         let [
@@ -230,7 +229,7 @@ pub struct AlarmInquiryResponse {
 }
 
 impl FromBytes for AlarmInquiryResponse {
-    type Err = error::Error;
+    type Err = crate::Error;
 
     fn from_bytes(s: &[u8]) -> Result<Self> {
         let [
@@ -267,7 +266,7 @@ pub struct ExtraPowerInfoResponse {
 }
 
 impl FromBytes for ExtraPowerInfoResponse {
-    type Err = error::Error;
+    type Err = crate::Error;
 
     fn from_bytes(s: &[u8]) -> Result<Self> {
         let [
@@ -303,7 +302,7 @@ pub struct AutonomyResponse {
 }
 
 impl FromBytes for AutonomyResponse {
-    type Err = error::Error;
+    type Err = crate::Error;
 
     fn from_bytes(s: &[u8]) -> Result<Self> {    
         let time = time::Duration::from_secs(
@@ -322,7 +321,7 @@ pub struct BatteryLifeResponse {
 }
 
 impl FromBytes for BatteryLifeResponse {
-    type Err = error::Error;
+    type Err = crate::Error;
 
     fn from_bytes(s: &[u8]) -> Result<Self> {
         let time = time::Duration::from_secs(
@@ -343,7 +342,7 @@ pub struct UPSInformation {
 }
 
 impl FromBytes for UPSInformation {
-    type Err = error::Error;
+    type Err = crate::Error;
 
     fn from_bytes(s: &[u8]) -> Result<Self> {
         let (mfg_name, s) = s.split_at(15);
@@ -371,7 +370,7 @@ pub struct UPSRating {
 }
 
 impl FromBytes for UPSRating {
-    type Err = error::Error;
+    type Err = crate::Error;
 
     fn from_bytes(s: &[u8]) -> Result<Self> {
         let [

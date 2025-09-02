@@ -1,4 +1,6 @@
 pub mod cplus;
+
+/// Trait for command responses (which are de-/serialized as a sequence of bytes).
 pub trait FromBytes {
     type Err;
 
@@ -6,7 +8,7 @@ pub trait FromBytes {
         where Self: Sized;
 }
 
-/// Test values taken directly from the protocol PDF
+/// Test values taken directly from the protocol PDF.
 #[cfg(test)]
 mod tests {
     use crate::model::FromBytes;
