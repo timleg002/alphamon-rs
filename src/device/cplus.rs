@@ -1,4 +1,4 @@
-use crate::{Error, Result};
+use crate::Result;
 use crate::model::FromBytes;
 use crate::model::cplus;
 use std::ffi::CString;
@@ -171,7 +171,6 @@ impl CPlusInterface for CPlusSerialInterface {
 
 #[cfg(feature = "usb-hidapi")]
 pub struct CPlusHidInterface {
-    api: hidapi::HidApi,
     device: hidapi::HidDevice,
 }
 
@@ -188,7 +187,7 @@ impl CPlusHidInterface {
 
         let device = api.open_path(path.as_c_str())?;
 
-        Ok(Self { api, device })
+        Ok(Self { device })
     }
 
     /// Connects to the given HID device with the given `vid` and `pid`.
@@ -197,7 +196,7 @@ impl CPlusHidInterface {
 
         let device = api.open(vid, pid)?;
 
-        Ok(Self { api, device })
+        Ok(Self { device })
     }
 
     /// Reads raw data from the data feature report.

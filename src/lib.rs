@@ -10,7 +10,9 @@ pub mod device;
 /// Models of UPS queries/commands and responses.
 pub mod model;
 
+
 #[derive(thiserror::Error, Debug)]
+/// Main error enum for this library.
 pub enum Error {
     #[error("Invalid format or length of response data")]
     InvalidFormat,
